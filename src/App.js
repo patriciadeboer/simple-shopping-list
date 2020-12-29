@@ -12,12 +12,13 @@ import {
 const App = () => {
   // HINT: each "item" in our list names a name, a boolean to tell if its been completed, and a quantity
   const [items, setItems] = useState([
-    { itemName: 'item 1', quantity: 1, isSelected: false },
-    { itemName: 'item 2', quantity: 2, isSelected: true },
-    { itemName: 'item 3', quantity: 1, isSelected: false },
+    { itemName: 'Bananas', quantity: 6, isSelected: false },
+    { itemName: 'Limes', quantity: 2, isSelected: true },
+    { itemName: 'Ginger Beer', quantity: 1, isSelected: false },
   ]);
 
   const [inputValue, setInputValue] = useState('');
+  const [totalCount, setTotalCount] = useState(9);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -27,6 +28,30 @@ const App = () => {
     const newItem = { itemName: inputValue, quantity: 1, isSelected: false };
     setItems([...items, newItem]);
     setInputValue('');
+  };
+
+  const handleIncrement = (type, index) => {
+    const updatedItems = [...items];
+    if (type === 'decrease' && updatedItems[index].quantity > 0) {
+      updatedItems[index].quantity--;
+    } else if (type === 'increase') {
+      updatedItems[index].quantity++;
+    }
+    setItems(updatedItems);
+    calculateTotal();
+  };
+
+  const toggleComplete = (idx) => {
+    const updatedItems = [...items];
+    updatedItems[idx].isSelected = !updatedItems[idx].isSelected;
+    setItems(updatedItems);
+  };
+
+  const calculateTotal = () => {
+    const newCount = items.reduce((accum, item) => {
+      return (accum += item.quantity);
+    }, 0);
+    setTotalCount(newCount);
   };
 
   return (
@@ -44,7 +69,7 @@ const App = () => {
         <div className="item-list">
           {items.map((item, idx) => (
             <div className="item-container">
-              <div className="item-name">
+              <div className="item-name" onClick={() => toggleComplete(idx)}>
                 {item.isSelected ? (
                   <>
                     <FontAwesomeIcon icon={faCheckCircle} />
@@ -59,17 +84,23 @@ const App = () => {
               </div>
               <div className="quantity">
                 <button>
-                  <FontAwesomeIcon icon={faChevronLeft} />
+                  <FontAwesomeIcon
+                    onClick={() => handleIncrement('decrease', idx)}
+                    icon={faChevronLeft}
+                  />
                 </button>
                 <span>{item.quantity}</span>
                 <button>
-                  <FontAwesomeIcon icon={faChevronRight} />
+                  <FontAwesomeIcon
+                    onClick={() => handleIncrement('increase', idx)}
+                    icon={faChevronRight}
+                  />
                 </button>
               </div>
             </div>
           ))}
         </div>
-        <div className="total">Total: 6</div>
+        <div className="total">Total: {totalCount}</div>
       </div>
     </div>
   );
